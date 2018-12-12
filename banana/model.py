@@ -19,7 +19,6 @@ class QNetwork(nn.Module):
         self.optimizer = optim.Adam(self.parameters(), lr=alpha)
         self.loss = nn.MSELoss()
         self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
-        print("GPU:", T.cuda.is_available())
         self.to(self.device)
 
     def forward(self, state):
@@ -56,9 +55,9 @@ class Agent(object):
         rand = np.random.random()
         actions = self.Q_eval.forward(state)
         if rand < 1 - self.EPSILON:
-            action = T.argmax(actions[1]).item()
+            action = T.argmax(actions).item()
         else:
-            action = np.random.choice(self.action_space, p=[0.4, 0.2, 0.2, 0.2])
+            action = np.random.choice(self.action_space, p=[0.25, 0.25, 0.25, 0.25])
         self.steps += 1
         return action
 
@@ -81,16 +80,21 @@ class Agent(object):
 
         maxA = T.argmax(Qnext, dim=1).to(self.Q_eval.device)
         rewards = T.Tensor(list(memory[:, 2])).to(self.Q_eval.device)
-        Qtarget = Qpred.clone().to(self.Q_eval.device)
-        Qtarget[:, maxA] = rewards + self.GAMMA * T.max(Qnext, dim=1)[0]
+        dones = T.Tensor(list(memory[:, 4])).float().to(self.Q_eval.device)
+        actions = T.Tensor(list(memory[:, 1])).long().to(self.Q_eval.device)
+        # Qtarget = Qpred.clone().to(self.Q_eval.device)
+        # Qtarget[:, maxA] = rewards + self.GAMMA * T.max(Qnext, dim=1)[0]
+        Qtarget = rewards + self.GAMMA * T.max(Qnext, dim=1)[0] * (1 - dones)
+        Q_e = Qpred.gather(1, actions.view(batch_size, 1))
+
 
         if self.steps > 500:
             if self.EPSILON - 1e-4 > self.EPS_END:
-                self.EPSILON -= 1e-3
+                self.EPSILON -= 1e-5
             else:
                 self.EPSILON = self.EPS_END
 
-        loss_f = self.Q_eval.loss(Qpred, Qtarget).to(self.Q_eval.device)
+        loss_f = self.Q_eval.loss(Q_e, Qtarget).to(self.Q_eval.device)
         loss_f.backward()
         self.Q_eval.optimizer.step()
         self.learn_step_counter += 1
