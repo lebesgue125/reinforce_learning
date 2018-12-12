@@ -18,7 +18,7 @@ state_size = len(state)
 print('States have length:', state_size)
 
 
-brain_agent = Agent(action_size, state_size, maxMemorySize=5000, gamma=0.99, epsilon=1.0, alpha=5e-3, repalce=None)
+brain_agent = Agent(action_size, state_size, maxMemorySize=5000, gamma=0.99, epsilon=1.0, alpha=6e-4, repalce=None)
 
 while brain_agent.memCntr < brain_agent.memSize:
     env_info = env.reset(train_mode=True)[brain_name]

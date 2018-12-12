@@ -90,7 +90,7 @@ class Agent(object):
 
         if self.steps > 500:
             if self.EPSILON - 1e-4 > self.EPS_END:
-                self.EPSILON -= 1e-5
+                self.EPSILON -= 2e-5
             else:
                 self.EPSILON = self.EPS_END
 
