@@ -23,7 +23,7 @@ ALPHA = 1e-4
 TAU = 1e-3
 gamma = 0.99
 epsilon = 1
-decay = 0.99
+decay = 0.999
 loss = 0
 mean_scores = 0
 batch_size = 32
@@ -40,6 +40,7 @@ with tf.Session() as session:
         env_info = env.reset(train_mode=True)[brain_name]
         states = env_info.vector_observations
         count += 1
+        loss = 0
         rewards = np.zeros(num_agents, dtype=np.float32)
         reward = np.zeros(num_agents, dtype=np.float32)
         start_time = time.time()
@@ -51,7 +52,7 @@ with tf.Session() as session:
             reward = env_info.rewards
             rewards += reward
             dones = env_info.local_done
-            agent.store(states, actions, rewards, next_states, dones)
+            agent.store(states, actions, reward, next_states, dones)
             states = next_states
             if agent.step % 4 == 0:
                 loss += agent.learn(batch_size, gamma)
@@ -60,8 +61,8 @@ with tf.Session() as session:
         print("\rNo.{} score this episode: {:.4f},\tloss: {:.4f},\tmean_scores: {:.4},\tepsilon: {:.4},\ttime: {:.4f}"
               .format(count, np.mean(rewards), loss / 250.0, np.mean(scores_list), epsilon, time.time()-start_time), end='')
         if count % 100 == 0:
-            print("\rNo.{} score this episode: {:.4f}, ".format(count, np.mean(scores_list)))
             mean_scores = np.mean(scores_list)
+            print("\rNo.{} score this episode: {:.4f}, ".format(count, mean_scores))
             scores_total.extend(scores_list)
             scores_list.clear()
 
@@ -99,8 +100,5 @@ with tf.Session() as session:
             print("\rNo.{} score this episode: {:.4f}, ".format(count, np.mean(scores_list)))
             scores_total.extend(scores_list)
             scores_list.clear()
-
-
-
 
 env.close()

@@ -22,7 +22,7 @@ class Actor(object):
         self.session.run(tf.global_variables_initializer())
 
     def train(self, state, action_grads):
-        self.session.run(self.optimize, {self.state: state, self.action_grad:action_grads})
+        self.session.run(self.optimize, {self.state: state, self.action_grad: action_grads})
 
     def target_train(self):
         actor_w = self.model.get_weights()
