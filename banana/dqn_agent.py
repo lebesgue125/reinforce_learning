@@ -30,7 +30,7 @@ gamma = 0.99
 alpha = 1e-4
 tua = 1e-3
 max_memory_size = 50000
-train = True
+train = False
 
 with tf.Session() as session:
     brain_agent = DQNAgent(session, state_size, action_size, max_memory_size, gamma, alpha, tua)

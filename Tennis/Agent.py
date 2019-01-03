@@ -1,5 +1,5 @@
 from unityagents import UnityEnvironment
-from network.DDPG_NEW import DDPG_AGENT
+from network.DDPG import DDPG_AGENT
 import numpy as np
 import tensorflow as tf
 import time
@@ -20,7 +20,7 @@ count = 0
 epsilon = 1.0
 decay = 0.9999
 TAU = 1e-3
-ALPHA = 1e-4
+ALPHA = 4e-5
 gamma = 0.99
 mean_score = 0
 batch_size = 64
@@ -60,7 +60,8 @@ def view(agent, num=1):
 with tf.Session() as session:
     agent = DDPG_AGENT(session, action_size, state_size, ALPHA, TAU, max_memory_size)
     saver = tf.train.Saver()
-    while mean_score < 0.5 and train:
+    saver.restore(session, save_path)
+    while mean_score < 2 and train:
         env_info = env.reset(train_mode=True)[brain_name]
         states = env_info.vector_observations
         scores = np.zeros(num_agents)
@@ -90,7 +91,7 @@ with tf.Session() as session:
             mean_score = np.mean(scores_list)
             scores_total.extend(scores_list)
             scores_list.clear()
-            print("\rNo.{} score this episode: {:.4f}, ".format(count, mean_score))
+            print("\rNo.{} score this episode: {:.4f}".format(count, mean_score))
 
     if train:
         saver.save(session, save_path)
@@ -99,6 +100,7 @@ with tf.Session() as session:
         plt.ylabel('Score')
         plt.xlabel('Episode #')
         plt.show()
+        view(agent, 10)
     else:
         saver.restore(session, save_path)
         view(agent, 10)

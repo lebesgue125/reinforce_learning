@@ -1,6 +1,6 @@
 from unityagents import UnityEnvironment
 import numpy as np
-from network.DDPG_NEW import DDPG_AGENT
+from network.DDPG import DDPG_AGENT
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import time
@@ -23,13 +23,13 @@ ALPHA = 5e-4
 TAU = 1e-3
 gamma = 0.99
 epsilon = 1
-decay = 0.999
+decay = 0.995
 mean_scores = 0
 batch_size = 64
 scores_list = []
 scores_total = []
 count = 0
-train = True
+train = False
 
 with tf.Session() as session:
     agent = DDPG_AGENT(session, action_size, state_size, ALPHA, TAU, max_memory_size)

@@ -2,6 +2,7 @@ import tensorflow as tf
 from util.HistoryStorage import HistoryStored
 from util.noise import *
 
+
 class Actor(object):
 
     def __init__(self, state_size, action_size, session, ALPHA, TAU):
@@ -21,7 +22,7 @@ class Actor(object):
         self.session.run(tf.global_variables_initializer())
 
     def train(self, state, action_grads):
-        self.session.run(self.optimize, {self.state: state, self.action_grad:action_grads})
+        self.session.run(self.optimize, {self.state: state, self.action_grad: action_grads})
 
     def target_train(self):
         actor_w = self.model.get_weights()
@@ -30,16 +31,11 @@ class Actor(object):
             actor_w_[i] = self.tau * actor_w[i] + (1 - self.tau) * actor_w_[i]
         self.model_.set_weights(actor_w_)
 
-
     def create_network(self):
         state = tf.keras.Input(shape=[self.state_size], dtype='float32')
         h0 = tf.keras.layers.Dense(64, activation='relu')(state)
         h1 = tf.keras.layers.Dense(128, activation='relu')(h0)
         R = tf.keras.layers.Dense(self.action_size, activation='tanh')(h1)
-        # a_2 = tf.keras.layers.Dense(1, activation='tanh')(h1)
-        # a_3 = tf.keras.layers.Dense(1, activation='tanh')(h1)
-        # a_4 = tf.keras.layers.Dense(1, activation='tanh')(h1)
-        # R = tf.keras.layers.concatenate([a_1, a_2, a_3, a_4], axis=1)
         model = tf.keras.Model(inputs=state, outputs=R)
         return model, model.trainable_weights, state
 
@@ -98,27 +94,34 @@ class DDPG_AGENT(object):
                                     max_memory_size)
         self.step = 0
 
-    def store(self, dict_data):
-        self.memory.add(dict_data)
+    def store(self, states, actions, rewards, next_states, dones):
+        trajectory = dict()
+        trajectory['actions'] = actions
+        trajectory['rewards'] = np.array(rewards)
+        trajectory['dones'] = [0 if d else 1 for d in dones]
+        trajectory['states'] = states
+        trajectory['state_'] = next_states
+        self.memory.add(trajectory)
 
-    def choose_action(self, state, epsilon, train=True):
-        action = self.actor.model.predict(state.reshape([1, self.state_size]))
+    def choose_action(self, state, epsilon, agent_num, train=True):
+        action = self.actor.model.predict(state.reshape([agent_num, self.state_size]))
         if train:
             action += max(epsilon, 0) * ou_generate_noise(action, 0.0, 0.60, 0.30)
         self.step += 1
+
         return action
 
     def learn(self, batch_size, gamma):
         if self.memory.total_record < batch_size + 2:
             return 0
         train_data = self.memory.take_sample(batch_size)
-        states = train_data['states']
-        actions = train_data['actions']
-        rewards = train_data['rewards']
-        state_ = train_data['state_']
-        dones = train_data['dones']
-        q_value_ = self.critic.model_.predict([state_, self.actor.model_.predict(state_)])
+        states = train_data['states'].reshape([-1, self.state_size])
+        actions = train_data['actions'].reshape([-1, self.action_size])
+        rewards = train_data['rewards'].reshape([-1, 1])
+        state_ = train_data['state_'].reshape([-1, self.state_size])
+        dones = train_data['dones'].reshape([-1, 1])
 
+        q_value_ = self.critic.model_.predict([state_, self.actor.model_.predict(state_)])
         y_t = rewards + gamma * dones * q_value_
         loss = self.critic.model.train_on_batch([states, actions], y_t)
         a_for_grad = self.actor.model.predict(states)

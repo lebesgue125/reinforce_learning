@@ -1,17 +1,22 @@
 #Navigation
-###Introduction:
-        In this project, you need to controll a agent to collect bananas. When your agent collect a yellow banana, you 
-    get +1 reward. Or get -1 reward when you collect a blue one. So we need to train a agent to get more than 13 rewards in 
-    one episode. we use dqn to solve this problem.
-    
-    In my project, you can run in dqn_agent.py or Navigation.ipynb. We use tensorflow for neuarl network frame.
-    
-    this is the episode and average score durining the running time.
-    
-        
-        
-    Episode: 100, 	Average Score: -0.11
-    Episode: 200, 	Average Score: 1.27
+##Introduction:
+In this project, you need to controll a agent to collect bananas. When your agent collect a yellow banana, you 
+get +1 reward. Or get -1 reward when you collect a blue one. So we need to train a agent to get more than 13 rewards in 
+one episode. 
+
+In my project, you can run in dqn_agent.py or Navigation.ipynb. 
+we use dqn to solve this problem and mse for loss function.
+We use tensorflow-gpu for neuarl network frame.
+
+## How to execute.
+You can execute the dqn_agent.py file or Navigation.ipynb.
+You can change the parameter 'train' to False to ship the training process and load the available weight in 
+result/banana directory.
+##Experiment Report    
+1. This is the episode and average score during the running time.
+```text
+    Episode: 100,   Average Score: -0.11
+    Episode: 200,   Average Score: 1.27
     Episode: 300, 	Average Score: 2.63
     Episode: 400, 	Average Score: 3.83
     Episode: 500, 	Average Score: 4.58
@@ -36,3 +41,6 @@
     Episode: 2400, 	Average Score: 12.23
     Episode: 2500, 	Average Score: 12.96
     Episode: 2600, 	Average Score: 13.39
+```  
+2. This is the picture of these scores that generate during the training process.
+![banana](https://i.ibb.co/qx48qrm/banana.png)
