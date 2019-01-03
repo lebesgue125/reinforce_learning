@@ -10,9 +10,9 @@ We use tensorflow-gpu for neuarl network frame.
 
 ## How to execute.
 You can execute the dqn_agent.py file or Navigation.ipynb.
-You can change the parameter 'train' to False to ship the training process and load the available weight in 
+You can change the parameter 'train' to False to skip the training process and load the available weight in 
 result/banana directory.
-## Experiment Report    
+## Experiment Report   
 1. This is the episode and average score during the running time.
 ```text
     Episode: 100,   Average Score: -0.11

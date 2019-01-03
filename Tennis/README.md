@@ -12,6 +12,10 @@ The task is episodic, and in order to solve the environment, your agents must ge
 The environment is considered solved, when the average (over 100 episodes) of those scores is at least +0.5.
 ## 2. Solution
 We use DDPG to train the two agent simultaneously.
+## 3. How to execute.
+You can execute the Agent.py.
+Change the parameter 'train' to False to skip the training process and load the available weight in 
+result/tennis directory.
 ## 3. Experiment Report
 1. This is the episode and average score during the running time.
 ```text

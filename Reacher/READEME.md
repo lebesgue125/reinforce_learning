@@ -5,6 +5,10 @@
 >You need to train a double-jointed arm to move to target locations. A reward of +0.1 is provided for each step that the agent's hand is in the goal location. Thus, the goal of your agent is to maintain its position at the target location for as many time steps as possible.
 >#### 2. Solution:
 >We adopt the DDPG algorithm to solve this problem. 
+>#### 3. How to execute.
+>You can execute the one_reacher.py.
+>Change the parameter 'train' to False to skip the training process and load the available weight in 
+>result/reacher-single directory.
 >#### 3. Experiment Report
 >1. This is the episode and average score during the running time.
 >```text
@@ -25,9 +29,19 @@
 >You need to train twenty double-jointed arm to move to target locations simultaneously. The reward is same to problem 1. 
 >### 2. Solution:
 >We use DDPG algorithm to train these arms.
->#### 3. Experiment Report
+>#### 3. How to execute.
+>You can execute the multiple_reacher.py.
+>Change the parameter 'train' to False to skip the training process and load the available weight in 
+>result/reacher_multiple directory.
+>#### 4. Experiment Report
 >1. This is the episode and average score during the running time.
 >```text
+>No.100 score this episode: 1.0235, 
+>No.200 score this episode: 2.0423, 
+>No.300 score this episode: 7.6524, 
+>No.400 score this episode: 15.5428, 
+>No.500 score this episode: 26.0732,
+>No.600 score this episode: 35.1221,
 >```
 >2. This is the picture of these scores that generate during the training process.
 >![multiple-reacher](https://i.ibb.co/ZWgrcD8/multiple-reacher.png)
