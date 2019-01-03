@@ -19,7 +19,7 @@ The observation space consists of 33 variables corresponding to position, rotati
 #### a. One_Reacher
 The project train a double-jointed arm to catch the ball.
 This project is in the 'Reacher' package. 
-==
+
 #### b. Multiple_Reacher
 The environment contains twenty double-jointed, you need to train them simultaneously.
 This project is in the 'Reacher' package.
