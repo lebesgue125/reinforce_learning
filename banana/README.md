@@ -15,8 +15,8 @@ result/banana directory.
 ## Experiment Report    
 1. This is the episode and average score during the running time.
 ```text
-    Episode: 100, Average Score: -0.11
-    Episode: 200, Average Score: 1.27
+    Episode: 100,   Average Score: -0.11
+    Episode: 200,   Average Score: 1.27
     Episode: 300, 	Average Score: 2.63
     Episode: 400, 	Average Score: 3.83
     Episode: 500, 	Average Score: 4.58
