@@ -1,11 +1,11 @@
-#Continuous Control
-##Introduction:
-###One double-jointed arm
->####1. Problem:
+# Continuous Control
+## Introduction:
+### One double-jointed arm
+>#### 1. Problem:
 >You need to train a double-jointed arm to move to target locations. A reward of +0.1 is provided for each step that the agent's hand is in the goal location. Thus, the goal of your agent is to maintain its position at the target location for as many time steps as possible.
->####2. Solution:
+>#### 2. Solution:
 >We adopt the DDPG algorithm to solve this problem. 
->####3. Experiment Report
+>#### 3. Experiment Report
 >1. This is the episode and average score during the running time.
 >```text
 >No.100 score this episode: 0.9096, 
@@ -20,12 +20,12 @@
 >2. This is the picture of these scores that generate during the training process.
 >![reacher-single](https://i.ibb.co/DMBzBMz/reacher-single.png)
 
-###Multiple double-jointed arm
->###1. Problem
+### Multiple double-jointed arm
+>### 1. Problem
 >You need to train twenty double-jointed arm to move to target locations simultaneously. The reward is same to problem 1. 
->###2. Solution:
+>### 2. Solution:
 >We use DDPG algorithm to train these arms.
->####3. Experiment Report
+>#### 3. Experiment Report
 >1. This is the episode and average score during the running time.
 >```text
 >```

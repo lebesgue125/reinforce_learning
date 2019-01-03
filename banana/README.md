@@ -1,5 +1,5 @@
-#Navigation
-##Introduction:
+# Navigation
+## Introduction:
 In this project, you need to controll a agent to collect bananas. When your agent collect a yellow banana, you 
 get +1 reward. Or get -1 reward when you collect a blue one. So we need to train a agent to get more than 13 rewards in 
 one episode. 
@@ -12,7 +12,7 @@ We use tensorflow-gpu for neuarl network frame.
 You can execute the dqn_agent.py file or Navigation.ipynb.
 You can change the parameter 'train' to False to ship the training process and load the available weight in 
 result/banana directory.
-##Experiment Report    
+## Experiment Report    
 1. This is the episode and average score during the running time.
 ```text
     Episode: 100,   Average Score: -0.11

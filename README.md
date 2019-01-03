@@ -1,7 +1,7 @@
 # reinforcement_learning
 ## Udacity Project
 This repository is for Udacity Projects. The game enivronemnt is in the 'environment' directory. 
-###1. Banana
+### 1. Banana
 A reward of +1 is provided for collecting a yellow banana, and a reward of -1 is provided for collecting a blue banana. Thus, the goal of your agent is to collect as many yellow bananas as possible while avoiding blue bananas.
 
 The state space has 37 dimensions and contains the agent's velocity, along with ray-based perception of objects around agent's forward direction. Given this information, the agent has to learn how to best select actions. Four discrete actions are available, corresponding to:
@@ -12,7 +12,7 @@ The state space has 37 dimensions and contains the agent's velocity, along with 
 > - **3** turn right.
 
 This Environment stops training and is considered solved with a 100 episode average of +14.
-###2. Reacher
+### 2. Reacher
 In this environment, a double-jointed arm can move to target locations. A reward of +0.1 is provided for each step that the agent's hand is in the goal location. Thus, the goal of your agent is to maintain its position at the target location for as many time steps as possible.
 
 The observation space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm. Each action is a vector with four numbers, corresponding to torque applicable to two joints. Every entry in the action vector should be a number between -1 and 1.
@@ -23,7 +23,7 @@ This project is in the 'Reacher' package.
 #### b. Multiple_Reacher
 The environment contains twenty double-jointed, you need to train them simultaneously.
 This project is in the 'Reacher' package.
-###3. Tennis
+### 3. Tennis
 This project is in the 'tennis' package.
 
 In this environment, two agents control rackets to bounce a ball over a net. If an agent hits the ball over the net, it receives a reward of +0.1. If an agent lets a ball hit the ground or hits the ball out of bounds, it receives a reward of -0.01. Thus, the goal of each agent is to keep the ball in play.
