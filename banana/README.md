@@ -1,6 +1,6 @@
 # Navigation
 ## Introduction:
-In this project, you need to controll a agent to collect bananas. When your agent collect a yellow banana, you 
+In this project, you need to control a agent to collect bananas. When your agent collect a yellow banana, you 
 get +1 reward. Or get -1 reward when you collect a blue one. So we need to train a agent to get more than 13 rewards in 
 one episode. 
 
