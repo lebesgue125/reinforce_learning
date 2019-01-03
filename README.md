@@ -2,6 +2,7 @@
 ## Udacity Project
 This repository is for Udacity Projects. The game enivronemnt is in the 'environment' directory. 
 ### 1. Banana
+This project is in the 'banana' package.
 A reward of +1 is provided for collecting a yellow banana, and a reward of -1 is provided for collecting a blue banana. Thus, the goal of your agent is to collect as many yellow bananas as possible while avoiding blue bananas.
 
 The state space has 37 dimensions and contains the agent's velocity, along with ray-based perception of objects around agent's forward direction. Given this information, the agent has to learn how to best select actions. Four discrete actions are available, corresponding to:
@@ -13,6 +14,7 @@ The state space has 37 dimensions and contains the agent's velocity, along with 
 
 This Environment stops training and is considered solved with a 100 episode average of +14.
 ### 2. Reacher
+This project is in the 'Reacher' package.
 In this environment, a double-jointed arm can move to target locations. A reward of +0.1 is provided for each step that the agent's hand is in the goal location. Thus, the goal of your agent is to maintain its position at the target location for as many time steps as possible.
 
 The observation space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm. Each action is a vector with four numbers, corresponding to torque applicable to two joints. Every entry in the action vector should be a number between -1 and 1.
