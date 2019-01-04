@@ -17,8 +17,8 @@ states = env_info.vector_observations
 state_size = states.shape[1]
 
 count = 0
-epsilon = 1.0
-decay = 0.9999
+epsilon = 0
+decay = 0.99
 TAU = 1e-3
 ALPHA = 4e-5
 gamma = 0.99
@@ -27,7 +27,7 @@ batch_size = 64
 scores_list = []
 scores_total = []
 max_memory_size = 50000
-train = True
+train = False
 
 
 def view(agent, num=1):
@@ -89,6 +89,8 @@ with tf.Session() as session:
               .format(count, np.mean(scores), loss, np.mean(scores_list), epsilon, time.time()-start_time), end='')
         if count % 100 == 0:
             mean_score = np.mean(scores_list)
+            if mean_score > 1.5:
+                saver.save(session, save_path)
             scores_total.extend(scores_list)
             scores_list.clear()
             print("\rNo.{} score this episode: {:.4f}".format(count, mean_score))

@@ -11,7 +11,6 @@ save_path = "../result/reacher_multiple/"
 brain_name = env.brain_names[0]
 brain = env.brains[brain_name]
 
-
 env_info = env.reset(train_mode=False)[brain_name]
 num_agents = len(env_info.agents)
 action_size = brain.vector_action_space_size
@@ -22,11 +21,14 @@ max_memory_size = 50000
 ALPHA = 1e-4
 TAU = 1e-3
 gamma = 0.99
-epsilon = 1
+epsilon = 1.0
 decay = 0.995
 loss = 0
-mean_scores = 0
+update_every = 4
+eps_end = 0.001
 batch_size = 32
+
+mean_scores = 0
 scores_list = []
 scores_total = []
 count = 0
@@ -54,15 +56,15 @@ with tf.Session() as session:
             dones = env_info.local_done
             agent.store(states, actions, reward, next_states, dones)
             states = next_states
-            if agent.step % 4 == 0:
+            if agent.step % update_every == 0:
                 loss += agent.learn(batch_size, gamma)
-        epsilon = max(epsilon * decay, 0.001)
+        epsilon = max(epsilon * decay, eps_end)
         scores_list.append(rewards)
         print("\rNo.{} score this episode: {:.4f},\tloss: {:.4f},\tmean_scores: {:.4},\tepsilon: {:.4},\ttime: {:.4f}"
               .format(count, np.mean(rewards), loss / 250.0, np.mean(scores_list), epsilon, time.time()-start_time), end='')
         if count % 100 == 0:
             mean_scores = np.mean(scores_list)
-            print("\rNo.{} score this episode: {:.4f}, ".format(count, mean_scores))
+            print("\rEpisode {} Average Score: {:.4f}".format(count, mean_scores))
             scores_total.extend(scores_list)
             scores_list.clear()
 
