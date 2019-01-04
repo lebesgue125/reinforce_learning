@@ -11,9 +11,9 @@ In this project, you need to control a agent to collect bananas. When your agent
 get +1 reward. Or get -1 reward when you collect a blue one. So we need to train a agent to get more than 13 rewards in 
 one episode. 
 
-we use dqn to solve this problem and mse for loss function.
+we use dqn and mse for loss function in the project.
 We use PyTorch for neural network frame.
-The code of the network in network/DQN_PyTorch.py
+The code of the network is in network/DQN_PyTorch.py
 
 ## Getting Started
 Running environment.
