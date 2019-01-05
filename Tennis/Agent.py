@@ -17,10 +17,10 @@ states = env_info.vector_observations
 state_size = states.shape[1]
 
 count = 0
-epsilon = 0
-decay = 0.99
+epsilon = 1.0
+decay = 0.9999
 TAU = 1e-3
-ALPHA = 4e-5
+ALPHA = 1e-4
 gamma = 0.99
 batch_size = 64
 
@@ -68,7 +68,7 @@ with tf.Session() as session:
         scores = np.zeros(num_agents)
         start_time = time.time()
         count += 1
-        loss = 0
+        loss = 0.0
         while True:
             actions = agent.choose_action(states, epsilon, num_agents)
             actions = np.clip(actions, -1, 1)
