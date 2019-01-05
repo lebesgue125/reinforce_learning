@@ -18,10 +18,11 @@ state = env_info.vector_observations
 state_size = state.shape[1]
 
 max_memory_size = 50000
-ALPHA = 5e-4
-TAU = 1e-3
+actor_alpha = 1e-4
+critic_alpha = 1e-3
+tau = 1e-3
 gamma = 0.99
-epsilon = 1
+epsilon = 1.0
 decay = 0.995
 batch_size = 64
 update_every = 4
@@ -31,9 +32,9 @@ mean_scores = 0
 scores_list = []
 scores_total = []
 count = 0
-train = False
+train = True
 
-agent = DDPG_AGENT(action_size, state_size, ALPHA, TAU, max_memory_size)
+agent = DDPG_AGENT(action_size, state_size, actor_alpha, critic_alpha, tau, max_memory_size)
 
 while mean_scores < 30 and train:
     dones = np.zeros(num_agents)
@@ -42,7 +43,6 @@ while mean_scores < 30 and train:
     count += 1
     rewards = np.zeros(num_agents, dtype=np.float32)
     start_time = time.time()
-    loss = 0
     while not np.any(dones):
         actions = agent.choose_action(states, epsilon, num_agents)
         actions = np.clip(actions, -1, 1)
@@ -54,14 +54,14 @@ while mean_scores < 30 and train:
         agent.store(states, actions, reward, next_states, dones)
         states = next_states
         if agent.step % update_every == 0:
-            loss += agent.learn(batch_size, gamma)
+            agent.learn(batch_size, gamma)
     epsilon = max(epsilon * decay, eps_end)
     scores_list.append(rewards)
-    print("\rNo.{} score this episode: {:.4f},\tloss: {:.4f},\tmean_scores: {:.4},\tepsilon: {:.4},\ttime: {:.4f}"
-          .format(count, rewards[0], loss / 250.0, np.mean(scores_list), epsilon, time.time()-start_time), end='')
+    print("\rNo.{} score this episode: {:.4f},\tmean_scores: {:.4},\tepsilon: {:.4},\ttime: {:.4f}"
+          .format(count, rewards[0], np.mean(scores_list), epsilon, time.time()-start_time), end='')
     if count % 100 == 0:
         mean_scores = np.mean(scores_list)
-        print("\rEpisode {} Average Score: {:.4f}, ".format(count, mean_scores))
+        print("\rEpisode {} Average Score: {:.4f}".format(count, mean_scores))
         scores_total.extend(scores_list)
         scores_list.clear()
 
@@ -74,7 +74,6 @@ def game_show(episode_num):
         states = env_info.vector_observations
         count += 1
         rewards = np.zeros(num_agents, dtype=np.float32)
-        reward = np.zeros(num_agents, dtype=np.float32)
         start_time = time.time()
         while not np.any(dones):
             actions = agent.choose_action(states, 0, num_agents, False)
@@ -89,7 +88,7 @@ def game_show(episode_num):
         print("\rNo.{} score this episode: {:.4f},\tmean_scores: {:.4},\ttime: {:.4f}"
               .format(count, rewards[0], np.mean(scores_list), time.time()-start_time), end='')
         if count % 100 == 0:
-            print("\rNo.{} score this episode: {:.4f}, ".format(count, np.mean(scores_list)))
+            print("\rEpisode {} Average Score: {:.4f}".format(count, np.mean(scores_list)))
             scores_total.extend(scores_list)
             scores_list.clear()
 

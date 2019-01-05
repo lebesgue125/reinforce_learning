@@ -22,12 +22,13 @@ decay = 0.99
 TAU = 1e-3
 ALPHA = 4e-5
 gamma = 0.99
-mean_score = 0
 batch_size = 64
+
+mean_score = 0
 scores_list = []
 scores_total = []
 max_memory_size = 50000
-train = False
+train = True    # change True to False to skip training process and load the saved weights.
 
 
 def view(agent, num=1):

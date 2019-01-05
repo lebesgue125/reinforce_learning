@@ -1,11 +1,9 @@
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
 import numpy as np
 import os
-from util.pytorch_param import dev
-from torch.autograd import Variable
+from util.pytorch_param import dev, numpy_to_tensor
 from util.HistoryStorage import HistoryStored
 from util.noise import *
 
@@ -23,9 +21,9 @@ class ActorNetwork(nn.Module):
         self.h3 = nn.Linear(128, self.action_size)
 
     def forward(self, states):
-        l1 = F.relu(T.from_numpy(states).float().to(dev))
-        l2 = F.relu(l1)
-        return F.tanh(l2)
+        l1 = F.relu(self.h1(states))
+        l2 = F.relu(self.h2(l1))
+        return F.tanh(self.h3(l2))
 
 
 class Actor(object):
@@ -37,18 +35,20 @@ class Actor(object):
         self.tau = TAU
         self.actor = ActorNetwork(state_size, action_size).to(dev)
         self.actor_ = ActorNetwork(state_size, action_size).to(dev)
-        self.optimizer = T.optim.Adam(self.alpha)
+        self.optimizer = T.optim.Adam(self.actor.parameters(), lr=self.alpha)
 
-    def train(self, state, action_grads):
-        grads = T.autograd.grad(self.actor.forward(state), Variable(self.actor.parameters()), -action_grads)
-        self.optimizer.zero_grad()
-        for (p, g) in zip(self.actor.parameters(), grads):
-            p.grad = g
+    def train(self, policy_loss):
+        policy_loss = policy_loss.mean()
+        policy_loss.backward()
         self.optimizer.step()
 
     def target_train(self):
         for eval_param, target_param in zip(self.actor.parameters(), self.actor_.parameters()):
             target_param.data.copy_(self.tau * eval_param.data + (1 - self.tau) * target_param.data)
+
+    def hard_update(self):
+        for eval_param, target_param in zip(self.actor.parameters(), self.actor_.parameters()):
+            target_param.data.copy_(eval_param.data)
 
     def save(self, path):
         T.save(self.actor.state_dict(), path + '/actor')
@@ -75,17 +75,15 @@ class CriticNetwork(nn.Module):
 
         self.s_heed = nn.Linear(self.state_size, 64)
         self.s_h1 = nn.Linear(64, 128)
-        self.a_h1 = nn.Linear(self.state_size, 128)
-        self.h2 = nn.Linear(128, 128)
+        self.a_h1 = nn.Linear(self.action_size, 128)
+        self.h2 = nn.Linear(256, 128)
         self.h3 = nn.Linear(128, self.action_size)
 
     def forward(self, states, actions):
-        s = T.from_numpy(states).float().to(dev)
-        a = T.from_numpy(actions).float().to(dev)
-        s_s = F.relu(self.s_heed(s))
+        s_s = F.relu(self.s_heed(states))
         s_1 = self.s_h1(s_s)
-        a_1 = self.a_h1(a)
-        s_a = s_1 + a_1
+        a_1 = self.a_h1(actions)
+        s_a = T.cat([s_1, a_1], 1)
         s_a_2 = F.relu(self.h2(s_a))
         return self.h3(s_a_2)
 
@@ -99,21 +97,24 @@ class Critic(object):
         self.alpha = ALPHA
         self.critic = CriticNetwork(state_size, action_size).to(dev)
         self.critic_ = CriticNetwork(state_size, action_size).to(dev)
-        self.optimizer = T.optim.Adam(self.alpha)
+        self.optimizer = T.optim.Adam(self.critic.parameters(), lr=self.alpha)
 
-    def gradients(self, states, actions):
-        return T.autograd.grad(self.critic.forward(states, actions), actions)
+    def gradient(self, states, a_for_grad):
+        return -self.critic.forward(states, a_for_grad)
 
     def target_train(self):
         for eval_param, target_param in zip(self.critic.parameters(), self.critic_.parameters()):
             target_param.data.copy_(self.tau * eval_param.data + (1 - self.tau) * target_param.data)
 
+    def hard_update(self):
+        for eval_param, target_param in zip(self.critic.parameters(), self.critic_.parameters()):
+            target_param.data.copy_(eval_param.data)
+
     def train_on_batch(self, states, actions, y_t):
-        loss = F.mse_loss(self.critic.forward(states, actions), y_t)
         self.optimizer.zero_grad()
+        loss = F.mse_loss(self.critic.forward(states, actions), y_t)
         loss.backward()
         self.optimizer.step()
-        return loss
 
     def save(self, path):
         T.save(self.critic.state_dict(), path + '/critic')
@@ -132,13 +133,13 @@ class Critic(object):
 
 class DDPG_AGENT(object):
 
-    def __init__(self, action_size, state_size, ALPHA, TAU, max_memory_size):
+    def __init__(self, action_size, state_size, actor_alpha, critic_alpha, tau, max_memory_size):
         self.action_size = action_size
         self.state_size = state_size
-        self.alpha = ALPHA
-        self.tau = TAU
-        self.actor = Actor(state_size, action_size, ALPHA, TAU)
-        self.critic = Critic(state_size, action_size, ALPHA, TAU)
+        self.actor = Actor(state_size, action_size, actor_alpha, tau)
+        self.critic = Critic(state_size, action_size, critic_alpha, tau)
+        self.actor.hard_update()
+        self.critic.hard_update()
         self.memory = HistoryStored('GameRecord',
                                     ['states', 'actions', 'rewards', 'state_', 'dones'],
                                     max_memory_size)
@@ -154,7 +155,11 @@ class DDPG_AGENT(object):
         self.memory.add(trajectory)
 
     def choose_action(self, state, epsilon, agent_num, train=True):
-        action = self.actor.actor.forward(state.reshape([agent_num, self.state_size]))
+        action_t = numpy_to_tensor(state.reshape([agent_num, self.state_size]), 'float')
+        self.actor.actor.eval()
+        with T.no_grad():
+            action = self.actor.actor.forward(action_t).cpu().data.numpy()
+        self.actor.actor.train()
         if train:
             action += max(epsilon, 0) * ou_generate_noise(action, 0.0, 0.60, 0.30)
         self.step += 1
@@ -165,21 +170,21 @@ class DDPG_AGENT(object):
         if self.memory.total_record < batch_size + 2:
             return 0
         train_data = self.memory.take_sample(batch_size)
-        states = train_data['states'].reshape([-1, self.state_size])
-        actions = train_data['actions'].reshape([-1, self.action_size])
-        rewards = train_data['rewards'].reshape([-1, 1])
-        state_ = train_data['state_'].reshape([-1, self.state_size])
-        dones = train_data['dones'].reshape([-1, 1])
+        states = numpy_to_tensor(train_data['states'].reshape([-1, self.state_size]), 'float')
+        actions = numpy_to_tensor(train_data['actions'].reshape([-1, self.action_size]), 'float')
+        rewards = numpy_to_tensor(train_data['rewards'].reshape([-1, 1]), 'float')
+        state_ = numpy_to_tensor(train_data['state_'].reshape([-1, self.state_size]), 'float')
+        dones = numpy_to_tensor(train_data['dones'].reshape([-1, 1]), 'float')
 
         q_value_ = self.critic.critic_.forward(state_, self.actor.actor_.forward(state_))
         y_t = rewards + gamma * dones * q_value_
-        loss = self.critic.train_on_batch(states, actions, y_t)
+        self.critic.train_on_batch(states, actions, y_t)
+        self.actor.optimizer.zero_grad()
         a_for_grad = self.actor.actor.forward(states)
-        grads = self.critic.gradients(states, a_for_grad)
-        self.actor.train(states, grads)
+        grads = self.critic.gradient(states, a_for_grad)
+        self.actor.train(grads)
         self.actor.target_train()
         self.critic.target_train()
-        return loss
 
     def save(self, path):
         self.actor.save(path)

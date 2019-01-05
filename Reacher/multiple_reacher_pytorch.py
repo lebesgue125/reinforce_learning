@@ -60,7 +60,7 @@ while mean_scores < 30 and train:
           .format(count, rewards[0], loss / 250.0, np.mean(scores_list), epsilon, time.time()-start_time), end='')
     if count % 100 == 0:
         mean_scores = np.mean(scores_list)
-        print("\rEpisode {} Average Score: {:.4f}, ".format(count, mean_scores))
+        print("\rEpisode {} Average Score: {:.4f}".format(count, mean_scores))
         scores_total.extend(scores_list)
         scores_list.clear()
 
