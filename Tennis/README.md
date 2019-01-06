@@ -13,11 +13,31 @@ The environment is considered solved, when the average (over 100 episodes) of th
 ## 2. Solution
 We use DDPG to train the two agent simultaneously.
 the code of DDPG and its agent is in 'network/DDPG_PyTorch.py' 
-## 3. How to execute.
+
+## 3. Getting Started
+Running environment.
+#### 1. Python
+> The python version is 3.6
+#### 2. UnityEnvironment
+>```text
+>$pip3 install UnityEnvironment
+>```
+#### 3. GPU-Environment:
+> 
+>CUDA 9.0
+>
+#### 4. Pytorch-GPU
+>torch-1.0.0-cp36-cp36m-win_amd64 
+>```text
+>$pip3 install https://download.pytorch.org/whl/cu90/torch-1.0.0-cp36-cp36m-win_amd64.whl
+>$pip3 install torchvision
+>```
+
+## 4. How to execute.
 You can execute the agent_pytorch.py.
 Change the parameter "train" in agent_pytorch.py to False to skip the training process and load the available weight in 
 result/tennis_pytorch directory.
-## 3. Experiment Report
+## 5. Experiment Report
 1. This is the episode and average score during the running time.
 ```text
 No.100 score this episode: -0.0020, 
