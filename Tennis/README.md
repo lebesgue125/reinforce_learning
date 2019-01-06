@@ -15,7 +15,7 @@ We use DDPG to train the two agent simultaneously.
 the code of DDPG and its agent is in 'network/DDPG_PyTorch.py' 
 ## 3. How to execute.
 You can execute the agent_pytorch.py.
-Change the parameter "train" in Agent.py to False to skip the training process and load the available weight in 
+Change the parameter "train" in agent_pytorch.py to False to skip the training process and load the available weight in 
 result/tennis_pytorch directory.
 ## 3. Experiment Report
 1. This is the episode and average score during the running time.
