@@ -28,17 +28,17 @@ class ActorNetwork(nn.Module):
 
 class Actor(object):
 
-    def __init__(self, state_size, action_size, ALPHA, TAU):
+    def __init__(self, state_size, action_size, alpha, tau):
         self.action_size = action_size
         self.state_size = state_size
-        self.alpha = ALPHA
-        self.tau = TAU
+        self.alpha = alpha
+        self.tau = tau
         self.actor = ActorNetwork(state_size, action_size).to(dev)
         self.actor_ = ActorNetwork(state_size, action_size).to(dev)
         self.optimizer = T.optim.Adam(self.actor.parameters(), lr=self.alpha)
 
     def train(self, policy_loss):
-        policy_loss = policy_loss.mean()
+        policy_loss = -policy_loss.sum()
         policy_loss.backward()
         self.optimizer.step()
 
@@ -56,7 +56,7 @@ class Actor(object):
 
     def load(self, path):
         p_a = path + '/actor'
-        if os.path.exists():
+        if os.path.exists(p_a):
             self.actor.load_state_dict(T.load(p_a))
             self.actor.to(dev)
         p_a_ = path + '/actor_'
@@ -77,30 +77,30 @@ class CriticNetwork(nn.Module):
         self.s_h1 = nn.Linear(64, 128)
         self.a_h1 = nn.Linear(self.action_size, 128)
         self.h2 = nn.Linear(256, 128)
-        self.h3 = nn.Linear(128, self.action_size)
+        self.h3 = nn.Linear(128, 1)
 
     def forward(self, states, actions):
         s_s = F.relu(self.s_heed(states))
         s_1 = self.s_h1(s_s)
-        a_1 = self.a_h1(actions)
-        s_a = T.cat([s_1, a_1], 1)
+        a_1 = F.relu(self.a_h1(actions))
+        s_a = T.cat((s_1, a_1), dim=1)
         s_a_2 = F.relu(self.h2(s_a))
         return self.h3(s_a_2)
 
 
 class Critic(object):
 
-    def __init__(self, state_size, action_size, ALPHA, TAU):
+    def __init__(self, state_size, action_size, alpha, tau):
         self.state_size = state_size
         self.action_size = action_size
-        self.tau = TAU
-        self.alpha = ALPHA
+        self.tau = tau
+        self.alpha = alpha
         self.critic = CriticNetwork(state_size, action_size).to(dev)
         self.critic_ = CriticNetwork(state_size, action_size).to(dev)
         self.optimizer = T.optim.Adam(self.critic.parameters(), lr=self.alpha)
 
     def gradient(self, states, a_for_grad):
-        return -self.critic.forward(states, a_for_grad)
+        return self.critic.forward(states, a_for_grad)
 
     def target_train(self):
         for eval_param, target_param in zip(self.critic.parameters(), self.critic_.parameters()):
@@ -131,7 +131,7 @@ class Critic(object):
             self.critic_.to(dev)
 
 
-class DDPG_AGENT(object):
+class DDPGAGENT(object):
 
     def __init__(self, action_size, state_size, actor_alpha, critic_alpha, tau, max_memory_size):
         self.action_size = action_size

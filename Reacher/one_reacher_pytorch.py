@@ -1,6 +1,6 @@
 from unityagents import UnityEnvironment
 import numpy as np
-from network.DDPG_PyTorch import DDPG_AGENT
+from network.DDPG_PyTorch import DDPGAGENT
 import matplotlib.pyplot as plt
 import time
 
@@ -23,7 +23,7 @@ critic_alpha = 1e-3
 tau = 1e-3
 gamma = 0.99
 epsilon = 1.0
-decay = 0.995
+decay = 0.999
 batch_size = 64
 update_every = 4
 eps_end = 0.001
@@ -34,7 +34,7 @@ scores_total = []
 count = 0
 train = True
 
-agent = DDPG_AGENT(action_size, state_size, actor_alpha, critic_alpha, tau, max_memory_size)
+agent = DDPGAGENT(action_size, state_size, actor_alpha, critic_alpha, tau, max_memory_size)
 
 while mean_scores < 30 and train:
     dones = np.zeros(num_agents)
